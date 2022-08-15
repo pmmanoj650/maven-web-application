@@ -1,0 +1,81 @@
+pipeline{
+    agent any
+    /*
+    agent{
+        label"nodename"
+    }
+    */
+    tools{
+        maven "Maven3.8.6"
+    }
+    options{
+        timestamps()
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '6', daysToKeepStr: '', numToKeepStr: '6'))
+    }
+    /*
+    triggers{
+        //BuildPeriodically
+        cron('* * * * *')
+        //PoleSCM
+        pollSCM('* * * * *')
+        //GithubHook Trigger
+        githubPush()
+    }
+            */
+    stages{
+        stage('checkoutcode'){
+            steps{
+                git 'https://github.com/pmmanoj650/maven-web-application.git'
+            }
+        }
+      stage('Build'){
+          steps{
+              sh "mvn clean package"
+          }
+      } 
+      stage('sonar&Nexus'){
+      parallel{
+      stage('ExecuteSonarQubeReport'){
+          steps{
+              sh "mvn clean sonar:sonar"
+          }
+      }
+      stage('Upload Artifact into Nexus'){
+          steps{
+              sh "mvn clean deploy"
+          }
+      }
+      }
+      }
+      stage('Deploy APP into Tomcat'){
+          steps{
+              sshagent(['b87653f5-36da-4006-b93f-db5261913160']) {
+    sh "scp target/maven-web-application.war ubuntu@54.172.49.133:/opt/apache-tomcat-9.0.64/webapps/"
+          }
+      }
+      }
+    }//stages ending
+    post{
+        always{
+            emailext body: '''Build is Over!!
+
+Regards
+Manoj,
+ph:+918919528124''', subject: 'Build Over..!!', to: 'pmmanoj1997@gmai.com'
+        }
+        failure{
+            emailext body: '''Build is Over!!
+
+Regards
+Manoj,
+ph:+918919528124''', subject: 'Build Over..!!', to: 'pmmanoj1997@gmai.com'
+        }
+    success{
+        emailext body: '''Build is Over!!
+
+Regards
+Manoj,
+ph:+918919528124''', subject: 'Build Over..!!', to: 'pmmanoj1997@gmai.com'
+    }
+    }
+}//pipeline ends
