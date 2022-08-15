@@ -46,7 +46,7 @@ pipeline{
       stage('Deploy APP into Tomcat'){
           steps{
               sshagent(['7332671d-f19d-4474-888d-85daeb95a36c']) {
-    sh "scp target/maven-web-application.war ubuntu@18.234.144.71:/opt/apache-tomcat-9.0.64/webapps/"
+    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ubuntu@18.234.144.71:/opt/apache-tomcat-9.0.64/webapps/"
           }
       }
       }
