@@ -1,5 +1,7 @@
 pipeline{
-    agent any
+    agent{
+      label"wallmart-node"
+      }
     /*
     agent{
         label"nodename"
@@ -33,6 +35,7 @@ pipeline{
               sh "mvn clean package"
           }
       } 
+      /*
       stage('ExecuteSonarQubeReport'){
           steps{
               sh "mvn clean sonar:sonar"
@@ -50,6 +53,7 @@ pipeline{
           }
       }
       }
+      */
     }//stages ending
     post{
         always{
