@@ -9,3 +9,4 @@ services:
     - mavenappbridge
 networks:
   mavenappbridge: 
+
